@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -l nodes=8:ppn=2
+#PBS -l walltime=0:30:00
+#PBS -o pfilter.out
+#PBS -A lc_jnc
+#PBS -j oe
+#PBS -N pfilter
+
+WORK_HOME=/home/rcf-40/jaluka/final3/src
+
+cd $WORK_HOME
+np=$(cat $PBS_NODEFILE | wc -l)
+
+source /usr/usc/mpich/default/mx-pgi/setup.sh
+
+WINDOWS="3"
+FILTERS="mean"
+for FILTER in $FILTERS ; do 
+   for WSIZE in $WINDOWS ; do
+	OUT=moon_f${FILTER}_w${WSIZE}.tiff
+	mpirun -np $np -machinefile $PBS_NODEFILE ./pfilter input/moon_in.tiff ${OUT} ${FILTER} ${WSIZE}
+   done
+done
